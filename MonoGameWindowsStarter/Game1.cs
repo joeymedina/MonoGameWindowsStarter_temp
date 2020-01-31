@@ -16,6 +16,12 @@ namespace MonoGameWindowsStarter
         Random random = new Random();
         Vector2 ballPosition = Vector2.Zero;
         Vector2 ballVelocity;
+        Texture2D paddle;
+        Rectangle paddleRect;
+        int paddleSpeed = 0;
+        KeyboardState oldKB;
+        KeyboardState newKB;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -39,6 +45,12 @@ namespace MonoGameWindowsStarter
 
             ballVelocity = new Vector2((float)random.NextDouble(), (float)random.NextDouble());
             ballVelocity.Normalize();
+
+            paddleRect.X = 0;
+            paddleRect.Y = 0;
+            paddleRect.Width = 50;
+            paddleRect.Height = 250;
+
             base.Initialize();
 
         }
@@ -52,6 +64,7 @@ namespace MonoGameWindowsStarter
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             ball = Content.Load<Texture2D>("ball2");
+            paddle = Content.Load<Texture2D>("pixel");
             // TODO: use this.Content to load your game content here
         }
 
@@ -71,10 +84,36 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            var keyboardState = Keyboard.GetState();
+            newKB = Keyboard.GetState();
+           
+            if (newKB.IsKeyDown(Keys.Up)
+                && !oldKB.IsKeyDown(Keys.Up))
+            {
+                paddleRect.Y -= 1;
+            }
+            if (newKB.IsKeyDown(Keys.Down)
+                && !oldKB.IsKeyDown(Keys.Down))
+            {
+                paddleRect.Y += 1;
+            }
+            paddleRect.Y += paddleSpeed;
+            if (paddleRect.Y < 0) paddleRect.Y = 0;
+            if (paddleRect.Y > GraphicsDevice.Viewport.Height - paddleRect.Height) paddleRect.Y = GraphicsDevice.Viewport.Height - paddleRect.Height;
+
+
+
+            //speed of paddle
+            if (newKB.IsKeyDown(Keys.Up) && !oldKB.IsKeyDown(Keys.Up)) 
+            paddleSpeed -= 1;
+            if (newKB.IsKeyDown(Keys.Down) && !oldKB.IsKeyDown(Keys.Down)) 
+            paddleSpeed += 1;
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-           
+            
             // TODO: Add your update logic here
             ballPosition += (float)gameTime.ElapsedGameTime.TotalMilliseconds * 1 * ballVelocity;
 
@@ -106,6 +145,9 @@ namespace MonoGameWindowsStarter
                 float delta = graphics.PreferredBackBufferWidth - 100 - ballPosition.X;
                 ballPosition.X += 2 * delta;
             }
+
+            oldKB = newKB;
+
             base.Update(gameTime);
         }
 
@@ -118,6 +160,7 @@ namespace MonoGameWindowsStarter
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             spriteBatch.Draw(ball, new Rectangle((int)ballPosition.X,(int)ballPosition.Y, 100, 100), Color.White);
+            spriteBatch.Draw(paddle, paddleRect, Color.Red);
             spriteBatch.End();
             // TODO: Add your drawing code here
             base.Draw(gameTime);

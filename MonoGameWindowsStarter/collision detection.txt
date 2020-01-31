@@ -1,0 +1,28 @@
+a.x + a.width <= b.x
+a.x >= b.x +b.wdith
+a.y - a.height <= b.y
+a.y >= b.y - width
+
+
+
+point in rectangle
+r.x <= p.x <=r.x + r.width
+r.y <= p.y <= r.y + r.width 
+
+point in circle
+r^2 >= (r.x - p.x) ^ 2 + (r.y - p.y) ^2
+
+
+circle and rectangle overlap
+n.x = clamp(c.x, r.x, r.x + r.width)
+n.y = clamp(c.y, r.y, r.y + r.height)
+
+
+clamp ( val min max)
+
+if val is less than min
+return min
+if val is greater than max
+return max
+else 
+return val
